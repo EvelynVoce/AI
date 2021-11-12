@@ -2,6 +2,8 @@ import csv
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from math import log
+from numpy import argmax
+
 
 class QNAPair:
     def __init__(self, row):
@@ -54,26 +56,27 @@ def get_tfidf(tf_bag_of_words, idfs):
 
 def get_similar(user_input) -> str:
     qna_list: list[QNAPair] = reading_csv()
-    docs = [q.question for q in qna_list]
+
+    docs: list[str] = [q.question for q in qna_list]
     docs.append(user_input) # Add the user input as the final document
+
     uniqueWords = {word for document in docs for word in document.split()}
     tfs = get_all_term_freq(docs)
     idfs = get_idf([get_num_of_words(document.split(), uniqueWords) for document in docs])
     tfidfs = [get_tfidf(tf, idfs) for tf in tfs]
+
     df = pd.DataFrame(tfidfs)
+    answer = calc_cos_similarity(df, qna_list)
+    return answer
 
+
+def calc_cos_similarity(df, qna_list):
     # Cosine similarity
-    cosine_similarity_scores: list[int] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
-    largest = 0
-    largest_index = 0
-    for index, data in enumerate(cosine_similarity_scores):
-        if data[0] > largest:
-            largest = data[0]
-            largest_index = index
-
-    if largest == 0:
+    cosine_similarity_scores: list[list[int]] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
+    max_index = argmax(cosine_similarity_scores)
+    if max(cosine_similarity_scores)[0] == 0:
         return "Sorry I do not understand"
-    return qna_list[largest_index].answer
+    return qna_list[max_index].answer
 
 # Input_counts
 #     input_counts = []
