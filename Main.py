@@ -1,7 +1,6 @@
 import aiml
 from wikipedia import summary, exceptions
 import similarity
-
 kern = aiml.Kernel()
 kern.bootstrap(learnFiles="mybot-basic.xml")
 
@@ -14,7 +13,6 @@ def main():
             continue
 
         answer: str = kern.respond(user_input)
-        # similarity.get_tf_idf2(answer)
 
         # Kernel recognises input and responds appropriately
         if answer[0] != '#':

@@ -1,6 +1,6 @@
 import csv
-import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
 
 
 class QNAPair:
@@ -16,39 +16,75 @@ def reading_csv() -> list[str]:
         return [QNAPair(row) for row in csv_reader]
 
 
+def computeTF(wordDict, bagOfWords):
+    tfDict = {}
+    bagOfWordsCount = len(bagOfWords)
+    for word, count in wordDict.items():
+        tfDict[word] = count / float(bagOfWordsCount)
+    return tfDict
+
+
+def get_num_of_words(bagOfWordsTest, uniqueWords):
+    numOfWordsTest = dict.fromkeys(uniqueWords, 0)
+    for word in bagOfWordsTest:
+        numOfWordsTest[word] += 1
+    return numOfWordsTest
+
+
+def tf_func(documents):
+    # Scalable solution
+    uniqueWords = {word for document in documents for word in document.split()}
+    num_of_words = [get_num_of_words(document.split(), uniqueWords) for document in documents]
+    tfs = [computeTF(num_of_words[index], document.split()) for index, document in enumerate(documents)]
+    tf = pd.DataFrame(tfs)
+    print(tf)
+    return tfs
+
+
+def computeIDF(documents):
+    import math
+    amount_of_docs = len(documents)
+
+    idfDict = dict.fromkeys(documents[0].keys(), 0)
+    for document in documents:
+        for word, fequency in document.items():
+            if fequency > 0:
+                idfDict[word] += 1
+
+    for word, val in idfDict.items():
+        idfDict[word] = math.log(amount_of_docs / int(val))
+
+    idfs = pd.DataFrame([idfDict])
+    print(idfs)
+    return idfDict
+
+
+def computeTFIDF(tfBagOfWords, idfs):
+    tfidf = {}
+    for word, val in tfBagOfWords.items():
+        tfidf[word] = val * idfs[word]
+    return tfidf
+
+
 def get_similar(user_input) -> str:
     qna_list: list[QNAPair] = reading_csv()
-    bag_of_words = set(user_input.split())
+    docs = [q.question for q in qna_list]
+    docs.append(user_input) # Add the user input as the final document
+    uniqueWords = {word for document in docs for word in document.split()}
+    tfs = tf_func(docs)
+    idfs = computeIDF([get_num_of_words(document.split(), uniqueWords) for document in docs])
+    tfidfs = [computeTFIDF(tf, idfs) for tf in tfs]
+    df = pd.DataFrame(tfidfs)
 
-    words_in_question = np.array([[word.lower() for word in x.question.split()] for x in qna_list], dtype=object)
+    # Cosine similarity
+    cosine_similarity_scores: list[int] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
+    largest = 0
+    largest_index = 0
+    for index, data in enumerate(cosine_similarity_scores):
+        if data[0] > largest:
+            largest = data[0]
+            largest_index = index
 
-    # TF
-    word_in_sentence: list[list[float]] = []
-    for word_in_question in words_in_question:
-        temp = []
-        for word in bag_of_words:
-            value = 0
-            for x in word_in_question:
-                if word == x:
-                    value += 1
-            temp.append(value / len(words_in_question))
-        word_in_sentence.append(temp)  # Term frequency
-
-    # Input_counts
-    input_counts = []
-    for word in bag_of_words:
-        value = 0
-        for input_word in user_input.split():
-            if word == input_word:
-                value += 1
-        input_counts.append(value / len(user_input.split()))
-
-    cosine_similarity_scores: list[int] = [cosine_similarity([sentence], [input_counts])
-                                           for sentence in word_in_sentence]
-
-    if max(cosine_similarity_scores) == 0:
+    if largest == 0:
         return "Sorry I do not understand"
-
-    for index, score in enumerate(cosine_similarity_scores):
-        if score == max(cosine_similarity_scores):
-            return qna_list[index].answer
+    return qna_list[largest_index].answer
