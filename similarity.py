@@ -27,11 +27,10 @@ def get_num_of_words(bagOfWordsTest, uniqueWords):
     return numOfWordsTest
 
 
-def tf_func(documents):
-    uniqueWords = {word for document in documents for word in document.split()}
-    num_of_words = [get_num_of_words(document.split(), uniqueWords) for document in documents]
-    tfs = [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
-    return tfs
+def get_all_term_freq(documents):
+    unique_words = {word for document in documents for word in document.split()}
+    num_of_words = [get_num_of_words(document.split(), unique_words) for document in documents]
+    return [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
 
 
 def get_idf(documents):
@@ -49,11 +48,8 @@ def get_idf(documents):
     return idf_dict
 
 
-def computeTFIDF(tfBagOfWords, idfs):
-    tfidf = {}
-    for word, val in tfBagOfWords.items():
-        tfidf[word] = val * idfs[word]
-    return tfidf
+def get_tfidf(tf_bag_of_words, idfs):
+    return {word: (val * idfs[word]) for word, val in tf_bag_of_words.items()}
 
 
 def get_similar(user_input) -> str:
@@ -61,9 +57,9 @@ def get_similar(user_input) -> str:
     docs = [q.question for q in qna_list]
     docs.append(user_input) # Add the user input as the final document
     uniqueWords = {word for document in docs for word in document.split()}
-    tfs = tf_func(docs)
+    tfs = get_all_term_freq(docs)
     idfs = get_idf([get_num_of_words(document.split(), uniqueWords) for document in docs])
-    tfidfs = [computeTFIDF(tf, idfs) for tf in tfs]
+    tfidfs = [get_tfidf(tf, idfs) for tf in tfs]
     df = pd.DataFrame(tfidfs)
 
     # Cosine similarity

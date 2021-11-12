@@ -20,7 +20,6 @@ def main():
             continue
 
         cmd, output = answer[1:].split('$')
-        print(output)
         if cmd == '0':  # Bye command
             print(output)
             break
