@@ -16,12 +16,8 @@ def reading_csv() -> list[str]:
         return [QNAPair(row) for row in csv_reader]
 
 
-def computeTF(wordDict, bagOfWords):
-    tfDict = {}
-    bagOfWordsCount = len(bagOfWords)
-    for word, count in wordDict.items():
-        tfDict[word] = count / float(bagOfWordsCount)
-    return tfDict
+def get_term_freq(wordDict, bagOfWords):
+    return {word:  (count / float(len(bagOfWords))) for (word, count) in wordDict.items()}
 
 
 def get_num_of_words(bagOfWordsTest, uniqueWords):
@@ -32,12 +28,10 @@ def get_num_of_words(bagOfWordsTest, uniqueWords):
 
 
 def tf_func(documents):
-    # Scalable solution
     uniqueWords = {word for document in documents for word in document.split()}
     num_of_words = [get_num_of_words(document.split(), uniqueWords) for document in documents]
-    tfs = [computeTF(num_of_words[index], document.split()) for index, document in enumerate(documents)]
+    tfs = [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
     tf = pd.DataFrame(tfs)
-    print(tf)
     return tfs
 
 
@@ -55,7 +49,6 @@ def computeIDF(documents):
         idfDict[word] = math.log(amount_of_docs / int(val))
 
     idfs = pd.DataFrame([idfDict])
-    print(idfs)
     return idfDict
 
 
@@ -88,3 +81,75 @@ def get_similar(user_input) -> str:
     if largest == 0:
         return "Sorry I do not understand"
     return qna_list[largest_index].answer
+
+# Input_counts
+#     input_counts = []
+#     for word in bag_of_words:
+#         value = 0
+#         for input_word in user_input.split():
+#             if word == input_word:
+#                 value += 1
+#         input_counts.append(value / len(user_input.split()))
+#
+#     cosine_similarity_scores: list[int] = [cosine_similarity([tf_idf], [input_counts])
+#                                            for tf_idf in list_of_tf_idf]
+
+
+
+# def get_similar(user_input) -> str:
+#     qna_list: list[QNAPair] = reading_csv()
+#     bag_of_words = set(user_input.split())
+#
+#     words_in_question = np.array([[word.lower() for word in x.question.split()] for x in qna_list], dtype=object)
+#     # word_in_sentence: list[list[int]] = [[1 if word_in_bag in word_in_question else 0 for word_in_bag in bag_of_words]
+#     #                                      for word_in_question in words_in_question]
+#
+#     # TF
+#     word_in_sentence: list[list[float]] = []
+#     for word_in_question in words_in_question:
+#         temp = []
+#         for word in bag_of_words:
+#             value = 0
+#             for x in word_in_question:
+#                 if word == x:
+#                     value += 1
+#             temp.append(value / len(words_in_question))
+#         word_in_sentence.append(temp)  # Term frequency
+#
+#     # IDF
+#     idf = []
+#     total_questions = len(words_in_question)
+#     for word_in_question in words_in_question:
+#         frequency = 0
+#         for word in word_in_question:
+#             if word in word_in_question:
+#                 frequency += 1
+#         idf.append(log(total_questions/frequency))
+#
+#     # TF-IDF
+#     list_of_tf_idf = [np.multiply(np.array(word_in_sentence[x]),
+#                                   np.array(idf[x])) for x in range(len(word_in_sentence))]
+#     df = pd.DataFrame(list_of_tf_idf)
+#     print(df)
+#
+#     # Input_counts
+#     input_counts = []
+#     for word in bag_of_words:
+#         value = 0
+#         for input_word in user_input.split():
+#             if word == input_word:
+#                 value += 1
+#         input_counts.append(value / len(user_input.split()))
+#
+#     cosine_similarity_scores: list[int] = [cosine_similarity([tf_idf], [input_counts])
+#                                            for tf_idf in list_of_tf_idf]
+#
+#     # cosine_similarity_scores: list[int] = [cosine_similarity([sentence], [input_counts])
+#     #                                      for sentence in word_in_sentence]
+#
+#     if max(cosine_similarity_scores) == 0:
+#         return "Sorry I do not understand"
+#
+#     for index, score in enumerate(cosine_similarity_scores):
+#         if score == max(cosine_similarity_scores):
+#             return qna_list[index].answer
