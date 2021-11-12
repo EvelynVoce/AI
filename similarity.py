@@ -1,7 +1,7 @@
 import csv
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
-
+from math import log
 
 class QNAPair:
     def __init__(self, row):
@@ -16,7 +16,7 @@ def reading_csv() -> list[str]:
         return [QNAPair(row) for row in csv_reader]
 
 
-def get_term_freq(wordDict, bagOfWords):
+def get_term_freq(wordDict, bagOfWords) -> dict:
     return {word:  (count / float(len(bagOfWords))) for (word, count) in wordDict.items()}
 
 
@@ -31,25 +31,22 @@ def tf_func(documents):
     uniqueWords = {word for document in documents for word in document.split()}
     num_of_words = [get_num_of_words(document.split(), uniqueWords) for document in documents]
     tfs = [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
-    tf = pd.DataFrame(tfs)
     return tfs
 
 
-def computeIDF(documents):
-    import math
-    amount_of_docs = len(documents)
+def get_idf(documents):
+    amount_of_docs: int = len(documents)
 
-    idfDict = dict.fromkeys(documents[0].keys(), 0)
+    idf_dict = dict.fromkeys(documents[0].keys(), 0)
     for document in documents:
         for word, fequency in document.items():
             if fequency > 0:
-                idfDict[word] += 1
+                idf_dict[word] += 1
 
-    for word, val in idfDict.items():
-        idfDict[word] = math.log(amount_of_docs / int(val))
+    for word, val in idf_dict.items():
+        idf_dict[word]: float = log(amount_of_docs / val)
 
-    idfs = pd.DataFrame([idfDict])
-    return idfDict
+    return idf_dict
 
 
 def computeTFIDF(tfBagOfWords, idfs):
@@ -65,7 +62,7 @@ def get_similar(user_input) -> str:
     docs.append(user_input) # Add the user input as the final document
     uniqueWords = {word for document in docs for word in document.split()}
     tfs = tf_func(docs)
-    idfs = computeIDF([get_num_of_words(document.split(), uniqueWords) for document in docs])
+    idfs = get_idf([get_num_of_words(document.split(), uniqueWords) for document in docs])
     tfidfs = [computeTFIDF(tf, idfs) for tf in tfs]
     df = pd.DataFrame(tfidfs)
 
