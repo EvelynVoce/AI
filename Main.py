@@ -1,13 +1,8 @@
-import aiml
-import pyttsx3
 from wikipedia import summary, exceptions
 from similarity import get_similar
 
-kern = aiml.Kernel()
-kern.bootstrap(learnFiles="mybot-basic.xml")
 
-
-def main(user_input: str):
+def main(kern, user_input: str):
     if user_input == "":
         return
 
@@ -23,7 +18,7 @@ def main(user_input: str):
     elif cmd == '1':  # Wikipedia command
         try:
             output = summary(output, sentences=3, auto_suggest=False)
-        except exceptions.PageError:
+        except exceptions.PageError or exceptions.DisambiguationError:
             output = "Sorry, I do not know that. Be more specific!"
 
     elif cmd == '99':  # Default command
