@@ -1,4 +1,4 @@
-import csv
+from csv import reader
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from math import log
@@ -13,29 +13,30 @@ class QNAPair:
 
 def reading_csv() -> list[str]:
     with open("knowledge.csv") as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader = reader(csv_file, delimiter=',')
         next(csv_reader)  # Skip the first line because it's just the headings for the columns
         return [QNAPair(row) for row in csv_reader]
 
 
-def get_term_freq(wordDict, bagOfWords) -> dict:
-    return {word:  (count / float(len(bagOfWords))) for (word, count) in wordDict.items()}
+def get_term_freq(word_dict, bag_of_words) -> dict:
+    return {word:  (count / float(len(bag_of_words))) for (word, count) in word_dict.items()}
 
 
-def get_num_of_words(bagOfWordsTest, uniqueWords):
-    numOfWordsTest = dict.fromkeys(uniqueWords, 0)
-    for word in bagOfWordsTest:
-        numOfWordsTest[word] += 1
-    return numOfWordsTest
+def get_num_of_words(bag_of_words_test, unique_words) -> dict:
+    bag_of_words_test_lower = [word.lower() for word in bag_of_words_test]
+    num_of_words_test = dict.fromkeys(unique_words, 0)
+    for word in bag_of_words_test_lower:
+        num_of_words_test[word] += 1
+    return num_of_words_test
 
 
-def get_all_term_freq(documents):
-    unique_words = {word for document in documents for word in document.split()}
+def get_all_term_freq(documents) -> list:
+    unique_words = {word.lower() for document in documents for word in document.split()}
     num_of_words = [get_num_of_words(document.split(), unique_words) for document in documents]
     return [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
 
 
-def get_idf(documents):
+def get_idf(documents) -> dict:
     amount_of_docs: int = len(documents)
 
     idf_dict = dict.fromkeys(documents[0].keys(), 0)
@@ -50,7 +51,7 @@ def get_idf(documents):
     return idf_dict
 
 
-def get_tfidf(tf_bag_of_words, idfs):
+def get_tfidf(tf_bag_of_words, idfs) -> dict:
     return {word: (val * idfs[word]) for word, val in tf_bag_of_words.items()}
 
 
@@ -60,7 +61,7 @@ def get_similar(user_input) -> str:
     docs: list[str] = [q.question for q in qna_list]
     docs.append(user_input) # Add the user input as the final document
 
-    uniqueWords = {word for document in docs for word in document.split()}
+    uniqueWords = {word.lower() for document in docs for word in document.split()}
     tfs = get_all_term_freq(docs)
     idfs = get_idf([get_num_of_words(document.split(), uniqueWords) for document in docs])
     tfidfs = [get_tfidf(tf, idfs) for tf in tfs]
@@ -70,8 +71,7 @@ def get_similar(user_input) -> str:
     return answer
 
 
-def calc_cos_similarity(df, qna_list):
-    # Cosine similarity
+def calc_cos_similarity(df, qna_list) -> str:
     cosine_similarity_scores: list[list[int]] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
     max_index = argmax(cosine_similarity_scores)
     if max(cosine_similarity_scores)[0] == 0:

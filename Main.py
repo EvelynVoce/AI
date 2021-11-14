@@ -1,42 +1,69 @@
 import aiml
+import pyttsx3
 from wikipedia import summary, exceptions
-import similarity
+from similarity import get_similar
+
 kern = aiml.Kernel()
 kern.bootstrap(learnFiles="mybot-basic.xml")
 
 
-def main():
-    print("Welcome to this chat bot. Please feel free to ask questions from me!")
-    while True:
-        user_input: str = input("> ")
-        if user_input == "":
-            continue
+def main(user_input: str):
+    if user_input == "":
+        return
 
-        answer: str = kern.respond(user_input)
+    answer: str = kern.respond(user_input)
+    # Kernel recognises input and responds appropriately
+    if answer[0] != '#':
+        return answer
 
-        # Kernel recognises input and responds appropriately
-        if answer[0] != '#':
-            print(answer)
-            continue
+    cmd, output = answer[1:].split('$')
+    if cmd == '0':  # Bye command
+        return output
 
-        cmd, output = answer[1:].split('$')
-        if cmd == '0':  # Bye command
-            print(output)
-            break
+    elif cmd == '1':  # Wikipedia command
+        try:
+            output = summary(output, sentences=3, auto_suggest=False)
+        except exceptions.PageError:
+            output = "Sorry, I do not know that. Be more specific!"
 
-        elif cmd == '1':  # Wikipedia command
-            try:
-                print(summary(output, sentences=3, auto_suggest=False))
-            except exceptions.PageError:
-                print("Sorry, I do not know that. Be more specific!")
-
-        elif cmd == '99':  # Default command
-            print(similarity.get_similar(user_input))
+    elif cmd == '99':  # Default command
+        output = get_similar(user_input)
+    return output
 
 
-if __name__ == "__main__":
-    main()
-
+# def main():
+#     print(welcome_message := "Welcome to this chat bot. Please feel free to ask questions from me!")
+#     speak(welcome_message)
+#     while True:
+#         user_input: str = input("> ")
+#         if user_input == "":
+#             continue
+#
+#         answer: str = kern.respond(user_input)
+#
+#         # Kernel recognises input and responds appropriately
+#         if answer[0] != '#':
+#             print(answer)
+#             speak(answer)
+#             continue
+#
+#         cmd, output = answer[1:].split('$')
+#         if cmd == '0':  # Bye command
+#             print(output)
+#             speak(output)
+#             break
+#
+#         elif cmd == '1':  # Wikipedia command
+#             try:
+#                 output = summary(output, sentences=3, auto_suggest=False)
+#             except exceptions.PageError:
+#                 output = "Sorry, I do not know that. Be more specific!"
+#
+#         elif cmd == '99':  # Default command
+#             output = similarity.get_similar(user_input)
+#
+#         print(output)
+#         speak(output)
 
 # from nltk.corpus import wordnet
 # from collections import Counter
