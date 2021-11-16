@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import font
 import aiml
-from Main import main
 from threading import Thread
 import speech_recognition as sr
 import pyttsx3
+from Main import main
 
 
 voice = pyttsx3.init()
@@ -18,8 +18,8 @@ bg_col = "steelblue"
 fg_col = "lightgoldenrod1"
 button_col = "pink"
 
-root = tk.Tk()  # Creates the root window
-root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))  # Creates a full screen window
+root = tk.Tk()  # Create root window
+root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))  # Create full screen window
 root.title("AI")  # Sets the name of the window
 root.config(bg=bg_col)  # Sets the background colour of the root window
 
@@ -39,19 +39,16 @@ def listen():
     r = sr.Recognizer()
     mic = sr.Microphone()
     with mic as source:
-        print("listening!")
         audio = r.listen(source)
         r.pause_threshold = 1
 
     try:
-        print("recognising")
-        query = r.recognize_google(audio, language="en-UK")
-        print("user said: ", query, "\n")
+        query: str = r.recognize_google(audio, language="en-UK")
         output: str = main(kern, query)
 
     except sr.UnknownValueError:
-        print("I was not able to understand")
         output: str = "I was not able to understand"
+        print(output)
 
     Thread(target=speak, args=(output,), daemon=True).start()
     clear_text_box()
@@ -99,8 +96,8 @@ def main_screen():
     scrollbar = tk.Scrollbar(root, command=text_box.yview)
     scrollbar.place(relx=0.89, rely=0.5, relheight=0.4)
 
-    submit_button = tk.Button(root, text="Submit", font=("arial", 10, "bold"), bg=button_col,
-                              command=lambda: check_entry())
+    submit_button = tk.Button(root, text="Submit", font=("arial", 10, "bold"),
+                              bg=button_col, command=lambda: check_entry())
     submit_button.place(relx=0.66, rely=0.35, relwidth=0.12, relheight=0.05)
 
     listen_button = tk.Button(root, text="Voice Input", font=("arial", 10, "bold"), bg=button_col,

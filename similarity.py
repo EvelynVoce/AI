@@ -23,20 +23,20 @@ def get_term_freq(word_dict, bag_of_words) -> dict:
 
 
 def get_num_of_words(bag_of_words_test, unique_words) -> dict:
-    bag_of_words_test_lower = [word.lower() for word in bag_of_words_test]
+    bag_of_words_test_lower: str = [word.lower() for word in bag_of_words_test]
     num_of_words_test: dict = dict.fromkeys(unique_words, 0)
     for word in bag_of_words_test_lower:
         num_of_words_test[word] += 1
     return num_of_words_test
 
 
-def get_all_term_freq(documents) -> list:
-    unique_words: set = {word.lower() for document in documents for word in document.split()}
-    num_of_words = [get_num_of_words(document.split(), unique_words) for document in documents]
+def get_all_term_freq(documents) -> list[dict]:
+    unique_words: set[str] = {word.lower() for document in documents for word in document.split()}
+    num_of_words: list[dict] = [get_num_of_words(document.split(), unique_words) for document in documents]
     return [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
 
 
-def get_idf(documents) -> dict:
+def get_idf(documents: list[dict]) -> dict:
     amount_of_docs: int = len(documents)
 
     idf_dict = dict.fromkeys(documents[0].keys(), 0)
@@ -55,19 +55,19 @@ def get_tfidf(tf_bag_of_words, idfs) -> dict:
     return {word: (val * idfs[word]) for word, val in tf_bag_of_words.items()}
 
 
-def get_similar(user_input) -> str:
+def get_similar(user_input: str) -> str:
     qna_list: list[QNAPair] = reading_csv()
 
     docs: list[str] = [q.question for q in qna_list]
     docs.append(user_input)  # Add the user input as the final document
 
-    unique_words = {word.lower() for document in docs for word in document.split()}
+    unique_words: set[str] = {word.lower() for document in docs for word in document.split()}
     tfs = get_all_term_freq(docs)
     idfs = get_idf([get_num_of_words(document.split(), unique_words) for document in docs])
     tfidfs = [get_tfidf(tf, idfs) for tf in tfs]
 
     df = pd.DataFrame(tfidfs)
-    answer = calc_cos_similarity(df, qna_list)
+    answer: str = calc_cos_similarity(df, qna_list)
     return answer
 
 

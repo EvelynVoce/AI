@@ -1,5 +1,15 @@
 from wikipedia import summary, exceptions
 from similarity import get_similar
+import nltk
+
+user_name: str = ""
+
+
+def extract_name(user_input: str) -> str:
+    for sent in nltk.sent_tokenize(user_input):
+        for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent))):
+            if hasattr(chunk, 'label'):
+                return ' '.join(c[0] for c in chunk.leaves())
 
 
 def main(kern, user_input: str):
@@ -20,6 +30,20 @@ def main(kern, user_input: str):
             output = summary(output, sentences=3, auto_suggest=False)
         except exceptions.PageError or exceptions.DisambiguationError:
             output = "Sorry, I do not know that. Be more specific!"
+
+    elif cmd == '3':  # Memory triggers
+        if "my name is" in user_input.lower():  # Extract name
+            global user_name
+            user_name = extract_name(user_input)
+            if user_name is None:
+                user_name = ""
+
+    elif cmd == '4':  # Memory retrieval
+        if "my name" in user_input.lower():
+            if user_name != "":
+                return user_name
+            else:
+                return "I do not know your name"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)

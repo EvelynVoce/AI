@@ -58,7 +58,17 @@
   <template><srai>BYE</srai></template></category>
   
   
-
+  
+ <!-- Name -->
+ <category> <pattern> MY NAME IS *</pattern>
+  <template>#3$Hello <star index="1"/> nice to meet you</template> </category>
+ 
+  <category> <pattern> WHAT IS MY NAME</pattern>
+  <template>#4$</template> </category>
+  
+  
+  
+<!-- Manners -->
 <category> <pattern> HOW ARE YOU </pattern>
   <template>I'm functioning within normal parameters, thanks for asking.</template></category>
 
