@@ -23,15 +23,14 @@ def get_term_freq(word_dict, bag_of_words) -> dict:
 
 
 def get_num_of_words(bag_of_words_test, unique_words) -> dict:
-    bag_of_words_test_lower: str = [word.lower() for word in bag_of_words_test]
+    bag_of_words_test_lower: set[str] = {word.lower() for word in bag_of_words_test}
     num_of_words_test: dict = dict.fromkeys(unique_words, 0)
     for word in bag_of_words_test_lower:
         num_of_words_test[word] += 1
     return num_of_words_test
 
 
-def get_all_term_freq(documents) -> list[dict]:
-    unique_words: set[str] = {word.lower() for document in documents for word in document.split()}
+def get_all_term_freq(documents, unique_words) -> list[dict]:
     num_of_words: list[dict] = [get_num_of_words(document.split(), unique_words) for document in documents]
     return [get_term_freq(num_of_words[index], document.split()) for index, document in enumerate(documents)]
 
@@ -62,19 +61,19 @@ def get_similar(user_input: str) -> str:
     docs.append(user_input)  # Add the user input as the final document
 
     unique_words: set[str] = {word.lower() for document in docs for word in document.split()}
-    tfs = get_all_term_freq(docs)
-    idfs = get_idf([get_num_of_words(document.split(), unique_words) for document in docs])
-    tfidfs = [get_tfidf(tf, idfs) for tf in tfs]
+    tfs: list[dict] = get_all_term_freq(docs, unique_words)
+    idfs: dict = get_idf([get_num_of_words(document.split(), unique_words) for document in docs])
+    tfidfs: list[dict] = [get_tfidf(tf, idfs) for tf in tfs]
 
     df = pd.DataFrame(tfidfs)
-    answer: str = calc_cos_similarity(df, qna_list)
-    return answer
+    return calc_cos_similarity(df, qna_list)
 
 
 def calc_cos_similarity(df, qna_list) -> str:
     cosine_similarity_scores: list[list[int]] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
     max_index = argmax(cosine_similarity_scores)
-    if max(cosine_similarity_scores)[0] == 0:  # If no similarity
+    print(max(cosine_similarity_scores)[0])
+    if max(cosine_similarity_scores)[0] < 0.41:  # If no similarity
         return "Sorry I do not understand"
     return qna_list[max_index].answer
 

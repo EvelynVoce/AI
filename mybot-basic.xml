@@ -68,6 +68,21 @@
   
   
   
+<!-- KB -->
+<category> <pattern> I KNOW THAT * IS *</pattern>
+<template>#31$<star index="1"/> is <star index="2"/></template> </category>
+
+<category> <pattern> CHECK THAT * IS *</pattern>
+<template>#32$It may not be true... let me check...<star index="1"/> is <star index="2"/></template> </category>
+  
+  
+  
+ <!-- Joke -->
+ <category> <pattern> TELL ME A JOKE</pattern>
+  <template>#5$</template> </category>
+  
+  
+  
 <!-- Manners -->
 <category> <pattern> HOW ARE YOU </pattern>
   <template>I'm functioning within normal parameters, thanks for asking.</template></category>
@@ -97,6 +112,7 @@
   <template><srai>WHAT IS THE WEATHER LIKE IN <star/></srai></template></category>
 
 
+
 <!--- Wikipedia API -->
 <category><pattern> WHAT IS A * </pattern>
   <template>#1$<star index="1"/></template></category>
@@ -112,6 +128,11 @@
 
 <category><pattern> WHO IS * </pattern>
   <template><srai>WHAT IS A <star/></srai></template></category>
+ 
+ <category><pattern> WHERE IS * </pattern>
+  <template><srai>WHAT IS A <star/></srai></template></category>
+
+
 
 <!-- Default reaction -->
 <category><pattern> * </pattern>

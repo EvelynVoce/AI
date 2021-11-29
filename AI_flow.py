@@ -1,6 +1,14 @@
 from wikipedia import summary, exceptions
 from similarity import get_similar
 import nltk
+from pyjokes import get_joke
+from nltk.sem import Expression
+import pandas
+
+read_expr = Expression.fromstring
+kb: list = []
+data = pandas.read_csv('kb.csv', header=None)
+[kb.append(read_expr(row)) for row in data[0]]
 
 user_name: str = ""
 
@@ -12,7 +20,7 @@ def extract_name(user_input: str) -> str:
                 return ' '.join(c[0] for c in chunk.leaves())
 
 
-def main(kern, user_input: str):
+def get_ai_response(kern, user_input: str):
     if user_input == "":
         return
 
@@ -27,7 +35,7 @@ def main(kern, user_input: str):
 
     elif cmd == '1':  # Wikipedia command
         try:
-            output = summary(output, sentences=3, auto_suggest=False)
+            output = summary(output, sentences=2, auto_suggest=False)
         except exceptions.PageError or exceptions.DisambiguationError:
             output = "Sorry, I do not know that. Be more specific!"
 
@@ -40,10 +48,23 @@ def main(kern, user_input: str):
 
     elif cmd == '4':  # Memory retrieval
         if "my name" in user_input.lower():
-            if user_name != "":
-                return user_name
-            else:
-                return "I do not know your name"
+            return user_name if user_name != "" else "I do not know your name"
+
+    elif cmd == '5':  # Random joke
+        output = get_joke(language="en", category="neutral")
+
+    elif cmd == "31":  # I know that x is y
+        object1, object2 = output.split(' is ')
+        expr = read_expr(object2 + '(' + object1 + ')')
+
+        # >>> ADD SOME CODES HERE to make sure expr does not contradict
+        # with the KB before appending, otherwise show an error message.
+
+        kb.append(expr)
+        return 'OK, I will remember that', object1, 'is', object2
+
+    elif cmd == "32":  # Check that x is y
+        pass
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)

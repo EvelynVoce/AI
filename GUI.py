@@ -4,7 +4,7 @@ import aiml
 from threading import Thread
 import speech_recognition as sr
 import pyttsx3
-from Main import main
+from AI_flow import get_ai_response
 
 
 voice = pyttsx3.init()
@@ -14,9 +14,9 @@ voice.setProperty('rate', rate+50)
 kern = aiml.Kernel()
 kern.bootstrap(learnFiles="mybot-basic.xml")
 
-bg_col = "steelblue"
-fg_col = "lightgoldenrod1"
-button_col = "pink"
+bg_col: str = "steelblue"
+fg_col: str = "lightgoldenrod1"
+button_col: str = "pink"
 
 root = tk.Tk()  # Create root window
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))  # Create full screen window
@@ -28,6 +28,7 @@ text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, f
 
 
 def speak(text):
+    print(text)
     voice.say(text)
     try:
         voice.runAndWait()
@@ -37,18 +38,18 @@ def speak(text):
 
 def listen():
     r = sr.Recognizer()
-    mic = sr.Microphone()
+    mic = sr.Microphone(device_index=1)
     with mic as source:
+        # r.adjust_for_ambient_noise(mic)  # Seems to make voice recognition worse
         audio = r.listen(source)
         r.pause_threshold = 1
 
     try:
         query: str = r.recognize_google(audio, language="en-UK")
-        output: str = main(kern, query)
+        output: str = get_ai_response(kern, query)
 
     except sr.UnknownValueError:
         output: str = "I was not able to understand"
-        print(output)
 
     Thread(target=speak, args=(output,), daemon=True).start()
     clear_text_box()
@@ -58,11 +59,9 @@ def listen():
 def clear_text_box():
     text_box.config(state=tk.NORMAL)
     text_box.delete('1.0', tk.END)
-    text_box.config(state=tk.DISABLED)
 
 
 def update_text_box(output):
-    text_box.config(state=tk.NORMAL)
     text_box.insert(tk.INSERT, output)
     text_box.config(state=tk.DISABLED)
 
@@ -70,8 +69,7 @@ def update_text_box(output):
 def check_entry(event=None):
     clear_text_box()
     user_input = question_entry.get()
-    output: str = main(kern, user_input)
-    print(output)
+    output: str = get_ai_response(kern, user_input)
     Thread(target=speak, args=(output,), daemon=True).start()
     update_text_box(output)
 
@@ -82,12 +80,11 @@ def underline(label):  # A reusable function where a label is passed in so it ca
     label.configure(font=f)  # Applies the new underlined font to the label
 
 
-def main_screen():
+def main_screen(intro_message: str):
     root.bind('<Return>', check_entry)
-    welcoming = tk.Label(root, text="Welcome to this chat bot. Please feel free to ask questions from me!",
+    welcoming = tk.Label(root, text=intro_message,
                          font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
     welcoming.place(relx=0.1, rely=0.05)
-    # welcoming.pack(side="top")  # Outputs the label at the top of the window
     underline(welcoming)
 
     question_entry.place(relx=0.1, rely=0.35, relwidth=0.55, relheight=0.05)
@@ -108,5 +105,5 @@ def main_screen():
 if __name__ == "__main__":
     welcome_message = "Welcome to this chat bot. Please feel free to ask questions from me!"
     Thread(target=speak, args=(welcome_message,), daemon=True).start()
-    main_screen()
+    main_screen(welcome_message)
     root.mainloop()
