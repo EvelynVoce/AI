@@ -1,6 +1,6 @@
 import speech_recognition as sr
 import pyttsx3
-from Main import main
+from AI_flow import main
 from threading import Thread
 from GUI import clear_text_box, update_text_box # Causes circular import
 

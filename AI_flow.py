@@ -3,12 +3,22 @@ from similarity import get_similar
 import nltk
 from pyjokes import get_joke
 from nltk.sem import Expression
-import pandas
+from pandas import read_csv
+
+from nltk.inference.resolution import ResolutionProverCommand
 
 read_expr = Expression.fromstring
-kb: list = []
-data = pandas.read_csv('kb.csv', header=None)
-[kb.append(read_expr(row)) for row in data[0]]
+data = read_csv('kb.csv', header=None)
+kb: list = [read_expr(row.lower()) for row in data[0]]
+
+# Checking KB integrity (no contradiction),
+# otherwise show an error message and terminate
+
+for knowledge in kb:
+    if not ResolutionProverCommand(knowledge, kb).prove():
+        print("ERROR: CONTRADICTION FOUND")
+        quit()
+# print(tp.proof())
 
 user_name: str = ""
 
@@ -24,7 +34,7 @@ def get_ai_response(kern, user_input: str):
     if user_input == "":
         return
 
-    answer: str = kern.respond(user_input)
+    answer: str = kern.respond(user_input.lower())
     # Kernel recognises input and responds appropriately
     if answer[0] != '#':
         return answer
@@ -42,7 +52,10 @@ def get_ai_response(kern, user_input: str):
     elif cmd == '3':  # Memory triggers
         if "my name is" in user_input.lower():  # Extract name
             global user_name
+            print("TTTTTTTTTTTTTTTTTTTTTTTT")
+            print(user_input)
             user_name = extract_name(user_input)
+            print(user_name)
             if user_name is None:
                 user_name = ""
 
@@ -50,21 +63,31 @@ def get_ai_response(kern, user_input: str):
         if "my name" in user_input.lower():
             return user_name if user_name != "" else "I do not know your name"
 
-    elif cmd == '5':  # Random joke
+    elif cmd == "5":  # Random joke
         output = get_joke(language="en", category="neutral")
 
     elif cmd == "31":  # I know that x is y
         object1, object2 = output.split(' is ')
         expr = read_expr(object2 + '(' + object1 + ')')
-
-        # >>> ADD SOME CODES HERE to make sure expr does not contradict
+        print(expr)
+        # Make sure expr does not contradict
         # with the KB before appending, otherwise show an error message.
 
+        if not ResolutionProverCommand(expr, kb).prove():
+            prove = ResolutionProverCommand(expr, kb)
+            prove.prove()
+            print(prove.proof())
+            return "ERROR: CONTRADICTION FOUND"
+
         kb.append(expr)
-        return 'OK, I will remember that', object1, 'is', object2
+        return f"OK, I will remember that {object1} is {object2}"
 
     elif cmd == "32":  # Check that x is y
-        pass
+        object1, object2 = output.split(' is ')
+        expr = read_expr(object2 + '(' + object1 + ')')
+        if ResolutionProverCommand(expr, kb).prove():
+            return f"I know that {object1} is {object2}"
+        return "I am unable to confirm that statement"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
