@@ -73,7 +73,7 @@ def check_entry(event=None):
     update_text_box(output)
 
 
-def underline(label):  # A reusable function where a label is passed in so it can be underlined
+def underline(label):  # A reusable function where a label is passed in, so it can be underlined
     f = font.Font(label, label.cget("font"))  # Creates a new font
     f.configure(underline=True)  # Underlines the new font
     label.configure(font=f)  # Applies the new underlined font to the label

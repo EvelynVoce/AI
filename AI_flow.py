@@ -72,21 +72,32 @@ def get_ai_response(kern, user_input: str):
         # with the KB before appending, otherwise show an error message.
 
         answer = ResolutionProver().prove(expr, kb, verbose=True)
-        if answer:
-            prove = ResolutionProverCommand(expr, kb)
-            prove.prove()
-            print(prove.proof())
-            return "ERROR: CONTRADICTION FOUND"
+        if not answer:
+            print("Wait one second")
+
+            expr2 = read_expr("-" + object2 + '(' + object1 + ')')
+            proven = ResolutionProver().prove(expr2, kb, verbose=True)
+            if proven:
+                return "ERROR: CONTRADICTION FOUND"
 
         kb.append(expr)
         return f"OK, I will remember that {object1} is {object2}"
 
     elif cmd == "32":  # Check that x is y
-
         object1, object2 = output.split(' is ')
         expr = read_expr(object2 + '(' + object1 + ')')
         answer = ResolutionProver().prove(expr, kb, verbose=True)
-        return f"I know that {object1} is {object2}" if answer else "I am unable to confirm that statement"
+        if answer:
+            return f"I know that {object1} is {object2}"
+        else:
+            print("Wait one second")
+
+            expr = read_expr("-" + object2 + '(' + object1 + ')')
+            proven = ResolutionProver().prove(expr, kb, verbose=True)
+            if proven:
+                return "That is false"
+            else:
+                return "I am unable to confirm that statement"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
@@ -94,7 +105,7 @@ def get_ai_response(kern, user_input: str):
 
 #
 # def main():
-#     print(welcome_message := "Welcome to this chat bot. Please feel free to ask questions from me!")
+#     print(welcome_message := "Welcome to this chatbot. Please feel free to ask questions from me!")
 #     speak(welcome_message)
 #     while True:
 #         user_input: str = input("> ")
