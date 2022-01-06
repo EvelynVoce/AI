@@ -2,8 +2,10 @@ from wikipedia import summary, exceptions
 from similarity import get_similar
 import nltk
 from pyjokes import get_joke
-from nltk.sem import Expression
 from pandas import read_csv
+
+from nltk.sem import Expression
+from nltk.inference import ResolutionProver
 
 from nltk.inference.resolution import ResolutionProverCommand
 
@@ -18,7 +20,6 @@ for knowledge in kb:
     if not ResolutionProverCommand(knowledge, kb).prove():
         print("ERROR: CONTRADICTION FOUND")
         quit()
-# print(tp.proof())
 
 user_name: str = ""
 
@@ -52,8 +53,6 @@ def get_ai_response(kern, user_input: str):
     elif cmd == '3':  # Memory triggers
         if "my name is" in user_input.lower():  # Extract name
             global user_name
-            print("TTTTTTTTTTTTTTTTTTTTTTTT")
-            print(user_input)
             user_name = extract_name(user_input)
             print(user_name)
             if user_name is None:
@@ -69,11 +68,11 @@ def get_ai_response(kern, user_input: str):
     elif cmd == "31":  # I know that x is y
         object1, object2 = output.split(' is ')
         expr = read_expr(object2 + '(' + object1 + ')')
-        print(expr)
         # Make sure expr does not contradict
         # with the KB before appending, otherwise show an error message.
 
-        if not ResolutionProverCommand(expr, kb).prove():
+        answer = ResolutionProver().prove(expr, kb, verbose=True)
+        if answer:
             prove = ResolutionProverCommand(expr, kb)
             prove.prove()
             print(prove.proof())
@@ -83,17 +82,17 @@ def get_ai_response(kern, user_input: str):
         return f"OK, I will remember that {object1} is {object2}"
 
     elif cmd == "32":  # Check that x is y
+
         object1, object2 = output.split(' is ')
         expr = read_expr(object2 + '(' + object1 + ')')
-        if ResolutionProverCommand(expr, kb).prove():
-            return f"I know that {object1} is {object2}"
-        return "I am unable to confirm that statement"
+        answer = ResolutionProver().prove(expr, kb, verbose=True)
+        return f"I know that {object1} is {object2}" if answer else "I am unable to confirm that statement"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
     return output
 
-
+#
 # def main():
 #     print(welcome_message := "Welcome to this chat bot. Please feel free to ask questions from me!")
 #     speak(welcome_message)
@@ -127,6 +126,7 @@ def get_ai_response(kern, user_input: str):
 #
 #         print(output)
 #         speak(output)
+
 
 # from nltk.corpus import wordnet
 # from collections import Counter

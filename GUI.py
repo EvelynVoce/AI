@@ -40,7 +40,6 @@ def listen():
     r = sr.Recognizer()
     mic = sr.Microphone(device_index=1)
     with mic as source:
-        # r.adjust_for_ambient_noise(mic)  # Seems to make voice recognition worse
         audio = r.listen(source)
         r.pause_threshold = 1
 
