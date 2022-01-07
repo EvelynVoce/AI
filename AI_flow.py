@@ -6,15 +6,13 @@ from pandas import read_csv
 
 from nltk.sem import Expression
 from nltk.inference import ResolutionProver
-
 from nltk.inference.resolution import ResolutionProverCommand
 
 read_expr = Expression.fromstring
 data = read_csv('kb.csv', header=None)
 kb: list = [read_expr(row.lower()) for row in data[0]]
 
-# Checking KB integrity (no contradiction),
-# otherwise show an error message and terminate
+# Checking KB integrity (no contradiction), otherwise show an error message and terminate
 
 for knowledge in kb:
     if not ResolutionProverCommand(knowledge, kb).prove():
@@ -31,7 +29,7 @@ def extract_name(user_input: str) -> str:
                 return ' '.join(c[0] for c in chunk.leaves())
 
 
-def get_ai_response(kern, user_input: str):
+def get_ai_response(kern, user_input: str) -> str:
     if user_input == "":
         return
 
@@ -90,80 +88,13 @@ def get_ai_response(kern, user_input: str):
         if answer:
             return f"I know that {object1} is {object2}"
         else:
-            print("Wait one second")
-
             expr = read_expr("-" + object2 + '(' + object1 + ')')
             proven = ResolutionProver().prove(expr, kb, verbose=True)
-            if proven:
-                return "That is false"
-            else:
-                return "I am unable to confirm that statement"
+            return "That is false"if proven else "I am unable to confirm that statement"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
     return output
-
-#
-# def main():
-#     print(welcome_message := "Welcome to this chatbot. Please feel free to ask questions from me!")
-#     speak(welcome_message)
-#     while True:
-#         user_input: str = input("> ")
-#         if user_input == "":
-#             continue
-#
-#         answer: str = kern.respond(user_input)
-#
-#         # Kernel recognises input and responds appropriately
-#         if answer[0] != '#':
-#             print(answer)
-#             speak(answer)
-#             continue
-#
-#         cmd, output = answer[1:].split('$')
-#         if cmd == '0':  # Bye command
-#             print(output)
-#             speak(output)
-#             break
-#
-#         elif cmd == '1':  # Wikipedia command
-#             try:
-#                 output = summary(output, sentences=3, auto_suggest=False)
-#             except exceptions.PageError:
-#                 output = "Sorry, I do not know that. Be more specific!"
-#
-#         elif cmd == '99':  # Default command
-#             output = similarity.get_similar(user_input)
-#
-#         print(output)
-#         speak(output)
-
-
-# from nltk.corpus import wordnet
-# from collections import Counter
-# from nltk import word_tokenize, pos_tag
-
-# My own code
-# sentence: str = input("Enter a sentence")
-# tokens: list[str] = word_tokenize(sentence)
-# tagged: tuple[(str, str)] = pos_tag(tokens)
-# print(tagged)
-# print(word_dict := dict(Counter(sentence.split())))  # Create word dict
-
-
-# class Word:
-#
-#     def __init__(self, w):
-#         self.word: str = w
-#         syn = wordnet.synsets(self.word)
-#         self.type: str = syn[0].lexname().split('.')[0] if syn else None
-
-
-# # Tokenize words
-# word_class: list[Word] = [Word(w) for w in sentence.split()]
-# for w in word_class:
-#     print(w.word, w.type)
-
 
 # WEATHER
 

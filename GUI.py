@@ -45,6 +45,7 @@ def listen():
 
     try:
         query: str = r.recognize_google(audio, language="en-UK")
+        print("AI heard:", query)
         output: str = get_ai_response(kern, query)
 
     except sr.UnknownValueError:
