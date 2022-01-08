@@ -6,16 +6,15 @@ from pandas import read_csv
 
 from nltk.sem import Expression
 from nltk.inference import ResolutionProver
-from nltk.inference.resolution import ResolutionProverCommand
+import fuzzy
 
 read_expr = Expression.fromstring
 data = read_csv('kb.csv', header=None)
 kb: list = [read_expr(row.lower()) for row in data[0]]
 
 # Checking KB integrity (no contradiction), otherwise show an error message and terminate
-
 for knowledge in kb:
-    if not ResolutionProverCommand(knowledge, kb).prove():
+    if not ResolutionProver().prove(knowledge, kb, verbose=True):
         print("ERROR: CONTRADICTION FOUND")
         quit()
 
@@ -92,6 +91,9 @@ def get_ai_response(kern, user_input: str) -> str:
             proven = ResolutionProver().prove(expr, kb, verbose=True)
             return "That is false"if proven else "I am unable to confirm that statement"
 
+    elif cmd == "33":  # Fuzzy logic test
+        fuzzy.main()
+
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
     return output
@@ -115,3 +117,11 @@ def get_ai_response(kern, user_input: str) -> str:
 #               "at the moment, humidity is", hum, "%, wind speed ", wsp, "m/s,", conditions)
 #     else:
 #         print("Sorry, I could not resolve the location you gave me.")
+
+
+
+
+
+
+
+

@@ -45,7 +45,6 @@ def get_idf(documents: list[dict]) -> dict:
     amount_of_docs: int = len(documents)
     for word, val in idf_dict.items():
         idf_dict[word]: float = log(amount_of_docs / val)
-
     return idf_dict
 
 
