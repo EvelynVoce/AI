@@ -5,7 +5,7 @@ from threading import Thread
 import speech_recognition as sr
 import pyttsx3
 from AI_flow import get_ai_response
-
+from fuzzy import fuzzy_logic
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
@@ -25,6 +25,12 @@ root.config(bg=bg_col)  # Sets the background colour of the root window
 
 question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
 text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
+
+
+def clear_root():
+    for ele in root.winfo_children():
+        ele.destroy()
 
 
 def speak(text):
@@ -70,8 +76,11 @@ def check_entry(event=None):
     clear_text_box()
     user_input = question_entry.get()
     output: str = get_ai_response(kern, user_input)
-    Thread(target=speak, args=(output,), daemon=True).start()
-    update_text_box(output)
+    if not output == "Fuzzy Logic":
+        Thread(target=speak, args=(output,), daemon=True).start()
+        update_text_box(output)
+    else:
+        fuzzy_gui()
 
 
 def underline(label):  # A reusable function where a label is passed in, so it can be underlined
@@ -100,6 +109,49 @@ def main_screen(intro_message: str):
     listen_button = tk.Button(root, text="Voice Input", font=("arial", 10, "bold"), bg=button_col,
                               command=lambda: Thread(target=listen, daemon=True).start())
     listen_button.place(relx=0.78, rely=0.35, relwidth=0.12, relheight=0.05)
+
+
+def get_rating(writing_score: int, acting_score: int, impact_score: int):
+    overall_rating: int = fuzzy_logic(writing_score, acting_score, impact_score)
+    rating_label.config(text=f"Overall rating: {overall_rating}")
+
+
+def fuzzy_gui():
+    clear_root()
+    login_title = tk.Label(root, text=welcome_message, font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
+    login_title.place(relx=0.50, rely=0.05, anchor=tk.CENTER)
+    # underline(login_title)
+    #
+    # back_button = create_back_button()
+    # back_button.config(command=lambda: clear_root() or main_screen())
+
+    writing_label = tk.Label(root, text="Writing:", font=("arial", 15, "bold"), fg=fg_col, bg=bg_col)
+    writing_label.place(relx=0.20, rely=0.35)
+
+    acting_label = tk.Label(root, text="Acting:", font=("arial", 15, "bold"), fg=fg_col, bg=bg_col)
+    acting_label.place(relx=0.20, rely=0.45)
+
+    impact_label = tk.Label(root, text="Impact:", font=("arial", 15, "bold"), fg=fg_col, bg=bg_col)
+    impact_label.place(relx=0.20, rely=0.55)
+
+    writing_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+    writing_entry.place(relx=0.30, rely=0.35, relwidth=0.5, relheight=0.05)
+
+    acting_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+    acting_entry.place(relx=0.30, rely=0.45, relwidth=0.5, relheight=0.05)
+
+    impact_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+    impact_entry.place(relx=0.30, rely=0.55, relwidth=0.5, relheight=0.05)
+
+    fuzzy_submission = tk.Button(root, text="Get overall rating", font=("arial", 10, "bold"),
+                                 bg=button_col, command=lambda:
+                                 get_rating(int(writing_entry.get()), int(acting_entry.get()),
+                                            int(impact_entry.get())))
+    fuzzy_submission.place(relx=0.20, rely=0.65, relwidth=0.28, relheight=0.1)
+
+    global rating_label
+    rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
+    rating_label.place(relx=0.6, rely=0.65)
 
 
 if __name__ == "__main__":

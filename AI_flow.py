@@ -6,7 +6,6 @@ from pandas import read_csv
 
 from nltk.sem import Expression
 from nltk.inference import ResolutionProver
-import fuzzy
 
 read_expr = Expression.fromstring
 data = read_csv('kb.csv', header=None)
@@ -92,7 +91,7 @@ def get_ai_response(kern, user_input: str) -> str:
             return "That is false"if proven else "I am unable to confirm that statement"
 
     elif cmd == "33":  # Fuzzy logic test
-        fuzzy.main()
+        return "Fuzzy Logic"
 
     elif cmd == '99':  # Default command
         output = get_similar(user_input)
