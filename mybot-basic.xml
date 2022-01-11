@@ -9,6 +9,7 @@
 			<li> Hello, how are you today? </li>
 			<li> Hey! </li>
 			<li> Hiya </li>
+            <li> Hey! What's your name? </li>
 		</random>
 	</template>
 </category>
@@ -61,7 +62,7 @@
   
  <!-- Name -->
  <category> <pattern> MY NAME IS *</pattern>
-  <template>#3$Hello <star index="1"/> nice to meet you</template> </category>
+  <template>#3$</template> </category>
  
   <category> <pattern> WHAT IS MY NAME</pattern>
   <template>#4$</template> </category>
@@ -76,7 +77,7 @@
 <template>#32$<star index="1"/> is <star index="2"/></template> </category>
 
 <category> <pattern> RATE EPISODE</pattern>
-<template>#33$template</template> </category>
+<template>#33$</template> </category>
 
 <category><pattern> RATE EPISODE *</pattern>
   <template><srai>RATE EPISODE</srai></template></category>
@@ -84,9 +85,12 @@
 
   
   
- <!-- Joke -->
- <category> <pattern> TELL ME A JOKE</pattern>
-  <template>#5$</template> </category>
+<!-- Joke -->
+<category> <pattern> TELL ME A JOKE</pattern>
+    <template>#5$</template> </category>
+
+<category> <pattern> CAN YOU TELL ME A JOKE </pattern>
+    <template><srai> TELL ME A JOKE </srai></template> </category>
   
   
   
@@ -107,7 +111,7 @@
   <template>Sure mate.</template></category>
 
 <category> <pattern> CHEERS * </pattern>
-  <template>Sure mate.</template></category>
+  <template><srai>CHEERS</srai></template></category>
 
 
 
@@ -138,6 +142,10 @@
  
  <category><pattern> WHERE IS * </pattern>
   <template><srai>WHAT IS A <star/></srai></template></category>
+
+
+<category><pattern> * WHAT IS * </pattern>
+  <template>#1$<star index="2"/></template></category>
 
 
 

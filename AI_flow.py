@@ -13,7 +13,7 @@ kb: list = [read_expr(row.lower()) for row in data[0]]
 
 # Checking KB integrity (no contradiction), otherwise show an error message and terminate
 for knowledge in kb:
-    if not ResolutionProver().prove(knowledge, kb, verbose=True):
+    if not ResolutionProver().prove(knowledge, kb):
         print("ERROR: CONTRADICTION FOUND")
         quit()
 
@@ -47,12 +47,14 @@ def get_ai_response(kern, user_input: str) -> str:
             output = "Sorry, I do not know that. Be more specific!"
 
     elif cmd == '3':  # Memory triggers
+        print(user_input)
         if "my name is" in user_input.lower():  # Extract name
             global user_name
             user_name = extract_name(user_input)
-            print(user_name)
+            print("Name = ", user_name)
             if user_name is None:
                 user_name = ""
+            return f"Hello {user_name}, it's really nice to meet you"
 
     elif cmd == '4':  # Memory retrieval
         if "my name" in user_input.lower():
@@ -67,12 +69,12 @@ def get_ai_response(kern, user_input: str) -> str:
         # Make sure expr does not contradict
         # with the KB before appending, otherwise show an error message.
 
-        answer = ResolutionProver().prove(expr, kb, verbose=True)
+        answer = ResolutionProver().prove(expr, kb)
         if not answer:
             print("Wait one second")
 
             expr2 = read_expr("-" + object2 + '(' + object1 + ')')
-            proven = ResolutionProver().prove(expr2, kb, verbose=True)
+            proven = ResolutionProver().prove(expr2, kb)
             if proven:
                 return "ERROR: CONTRADICTION FOUND"
 
@@ -82,12 +84,12 @@ def get_ai_response(kern, user_input: str) -> str:
     elif cmd == "32":  # Check that x is y
         object1, object2 = output.split(' is ')
         expr = read_expr(object2 + '(' + object1 + ')')
-        answer = ResolutionProver().prove(expr, kb, verbose=True)
+        answer = ResolutionProver().prove(expr, kb)
         if answer:
             return f"I know that {object1} is {object2}"
         else:
             expr = read_expr("-" + object2 + '(' + object1 + ')')
-            proven = ResolutionProver().prove(expr, kb, verbose=True)
+            proven = ResolutionProver().prove(expr, kb)
             return "That is false"if proven else "I am unable to confirm that statement"
 
     elif cmd == "33":  # Fuzzy logic test
