@@ -1,6 +1,13 @@
 Timelord (Doctor),
 Timelord (Master),
 Timelord (x) -> Gallifreyan (x),
+Companion (Rose),
+Companion (Micky),
+Companion (Martha),
+Companion (Donna),
+Companion (Yaz),
+Companion (Dan)
+Companion(c) -> Human(c)
 Human (h) -> -Timelord (h),
 Dalek (d) -> -Timelord (d),
 Human (h) -> -Dalek (h),
