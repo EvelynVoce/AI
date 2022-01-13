@@ -23,9 +23,18 @@ root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenhe
 root.title("AI")  # Sets the name of the window
 root.config(bg=bg_col)  # Sets the background colour of the root window
 
-question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
-text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
-rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
+question_entry = tk.Entry()
+text_box = tk.Text()
+rating_label = tk.Label()
+
+
+def globalise():
+    global question_entry
+    question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+    global text_box
+    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+    global rating_label
+    rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
 
 
 def clear_root():
@@ -89,13 +98,16 @@ def underline(label):  # A reusable function where a label is passed in, so it c
     label.configure(font=f)  # Applies the new underlined font to the label
 
 
-def main_screen(intro_message: str):
+def main_screen():
+    globalise()
+    intro_message: str = "Welcome to this chat bot. Please feel free to ask questions from me!"
     root.bind('<Return>', check_entry)
     welcoming = tk.Label(root, text=intro_message,
                          font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
     welcoming.place(relx=0.1, rely=0.05)
     underline(welcoming)
 
+    global question_entry
     question_entry.place(relx=0.1, rely=0.35, relwidth=0.55, relheight=0.05)
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
 
@@ -120,10 +132,11 @@ def fuzzy_gui():
     clear_root()
     login_title = tk.Label(root, text=welcome_message, font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
     login_title.place(relx=0.50, rely=0.05, anchor=tk.CENTER)
-    # underline(login_title)
-    #
-    # back_button = create_back_button()
-    # back_button.config(command=lambda: clear_root() or main_screen())
+    underline(login_title)
+
+    back_button = tk.Button(root, text="back", font=("arial", 10, "bold"), bg=button_col,
+                            command=lambda: clear_root() or main_screen())
+    back_button.place(relx=0.75, rely=0.025, relwidth=0.2, relheight=0.05)
 
     writing_label = tk.Label(root, text="Writing:", font=("arial", 15, "bold"), fg=fg_col, bg=bg_col)
     writing_label.place(relx=0.20, rely=0.35)
@@ -157,5 +170,5 @@ def fuzzy_gui():
 if __name__ == "__main__":
     welcome_message = "Welcome to this chat bot. Please feel free to ask questions from me!"
     Thread(target=speak, args=(welcome_message,), daemon=True).start()
-    main_screen(welcome_message)
+    main_screen()
     root.mainloop()

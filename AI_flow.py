@@ -12,10 +12,9 @@ data = read_csv('kb.csv', header=None)
 kb: list = [read_expr(row.lower()) for row in data[0]]
 
 # Checking KB integrity (no contradiction), otherwise show an error message and terminate
-for knowledge in kb:
-    if not ResolutionProver().prove(knowledge, kb):
-        print("ERROR: CONTRADICTION FOUND")
-        quit()
+if ResolutionProver().prove(None, kb):
+    print("ERROR: CONTRADICTION FOUND")
+    quit()
 
 user_name: str = ""
 
@@ -28,6 +27,7 @@ def extract_name(user_input: str) -> str:
 
 
 def get_ai_response(kern, user_input: str) -> str:
+    print(user_input)
     if user_input == "":
         return
 
@@ -37,26 +37,24 @@ def get_ai_response(kern, user_input: str) -> str:
         return answer
 
     cmd, output = answer[1:].split('$')
-    if cmd == '0':  # Bye command
+    if cmd == "0":  # Bye command
         return output
 
-    elif cmd == '1':  # Wikipedia command
+    elif cmd == "1":  # Wikipedia command
         try:
             output = summary(output, sentences=2, auto_suggest=False)
         except exceptions.PageError or exceptions.DisambiguationError:
             output = "Sorry, I do not know that. Be more specific!"
 
-    elif cmd == '3':  # Memory triggers
-        print(user_input)
+    elif cmd == "3":  # Memory triggers
         if "my name is" in user_input.lower():  # Extract name
             global user_name
             user_name = extract_name(user_input)
-            print("Name = ", user_name)
             if user_name is None:
                 user_name = ""
             return f"Hello {user_name}, it's really nice to meet you"
 
-    elif cmd == '4':  # Memory retrieval
+    elif cmd == "4":  # Memory retrieval
         if "my name" in user_input.lower():
             return user_name if user_name != "" else "I do not know your name"
 
@@ -95,7 +93,7 @@ def get_ai_response(kern, user_input: str) -> str:
     elif cmd == "33":  # Fuzzy logic test
         return "Fuzzy Logic"
 
-    elif cmd == '99':  # Default command
+    elif cmd == "99":  # Default command
         output = get_similar(user_input)
     return output
 

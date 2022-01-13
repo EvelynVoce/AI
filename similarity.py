@@ -19,7 +19,7 @@ def reading_csv() -> list[QNAPair]:
 
 
 def get_term_freq(word_dict: dict, bag_of_words: dict[str]) -> dict:
-    return {word:  (count / float(len(bag_of_words))) for (word, count) in word_dict.items()}
+    return {word: (count / float(len(bag_of_words))) for (word, count) in word_dict.items()}
 
 
 def get_num_of_words(bag_of_words_test: dict[str], unique_words: set[str]) -> dict:
