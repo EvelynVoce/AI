@@ -1,4 +1,4 @@
-from simpful import *
+from simpful import FuzzySystem, FuzzySet, Triangular_MF, Trapezoidal_MF, LinguisticVariable
 
 
 def func():
@@ -9,7 +9,7 @@ def func():
 
 
 def fuzzy_logic(writing_score: int, acting_score: int, impact_score: int):
-    fs = FuzzySystem()
+    fs = FuzzySystem(show_banner=False)
 
     # Define fuzzy sets and linguistic variables
     fs.add_linguistic_variable("Writing", LinguisticVariable(func(), universe_of_discourse=[0, 10]))

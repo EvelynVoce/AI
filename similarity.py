@@ -22,7 +22,7 @@ def get_term_freq(word_dict: dict, bag_of_words: dict[str]) -> dict:
     return {word: (count / float(len(bag_of_words))) for (word, count) in word_dict.items()}
 
 
-def get_num_of_words(bag_of_words_test: dict[str], unique_words: set[str]) -> dict:
+def get_num_of_words(bag_of_words_test: list[str], unique_words: set[str]) -> dict:
     bag_of_words_test_lower: set[str] = {word.lower() for word in bag_of_words_test}
     num_of_words_test: dict = dict.fromkeys(unique_words, 0)
     for word in bag_of_words_test_lower:
@@ -64,7 +64,7 @@ def get_similar(user_input: str) -> str:
     return calc_cos_similarity(pd.DataFrame(tfidfs), qna_list)
 
 
-def calc_cos_similarity(df, qna_list: list[str]) -> str:
+def calc_cos_similarity(df, qna_list: list[QNAPair]) -> str:
     cosine_similarity_scores: list[list[int]] = cosine_similarity(df.iloc[:-1], df.iloc[-1:])
     max_index = argmax(cosine_similarity_scores)
     return "Sorry I do not understand" if max(cosine_similarity_scores)[0] < 0.41 else qna_list[max_index].answer

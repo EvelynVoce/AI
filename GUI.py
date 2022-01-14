@@ -126,6 +126,7 @@ def main_screen():
 def get_rating(writing_score: int, acting_score: int, impact_score: int):
     overall_rating: int = fuzzy_logic(writing_score, acting_score, impact_score)
     rating_label.config(text=f"Overall rating: {overall_rating}")
+    Thread(target=speak, args=(overall_rating,), daemon=True).start()
 
 
 def fuzzy_gui():

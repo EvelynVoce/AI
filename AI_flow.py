@@ -96,31 +96,3 @@ def get_ai_response(kern, user_input: str) -> str:
     elif cmd == "99":  # Default command
         output = get_similar(user_input)
     return output
-
-# WEATHER
-
-
-# elif cmd == '2':  # Weather command: Test if this works!
-#     api_key: str = "5403a1e0442ce1dd18cb1bf7c40e776f"
-#     api_url: str = r"http://api.openweathermap.org/data/2.5/weather?q="
-#     response = get(api_url + output + r"&units=metric&APPID=" + api_key)
-#     response_json = loads(response.content)
-#     if response.status_code == 200 and response_json:
-#         t = response_json['main']['temp']
-#         tmi = response_json['main']['temp_min']
-#         tma = response_json['main']['temp_max']
-#         hum = response_json['main']['humidity']
-#         wsp = response_json['wind']['speed']
-#         conditions = response_json['weather'][0]['description']
-#         print("The temperature is", t, "°C, varying between", tmi, "and", tma,
-#               "at the moment, humidity is", hum, "%, wind speed ", wsp, "m/s,", conditions)
-#     else:
-#         print("Sorry, I could not resolve the location you gave me.")
-
-
-
-
-
-
-
-
