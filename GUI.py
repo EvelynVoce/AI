@@ -108,7 +108,7 @@ def main_screen():
     underline(welcoming)
 
     global question_entry
-    question_entry.place(relx=0.1, rely=0.35, relwidth=0.55, relheight=0.05)
+    question_entry.place(relx=0.1, rely=0.35, relwidth=0.45, relheight=0.05)
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
 
     scrollbar = tk.Scrollbar(root, command=text_box.yview)
@@ -116,11 +116,15 @@ def main_screen():
 
     submit_button = tk.Button(root, text="Submit", font=("arial", 10, "bold"),
                               bg=button_col, command=lambda: check_entry())
-    submit_button.place(relx=0.66, rely=0.35, relwidth=0.12, relheight=0.05)
+    submit_button.place(relx=0.56, rely=0.35, relwidth=0.10, relheight=0.05)
 
     listen_button = tk.Button(root, text="Voice Input", font=("arial", 10, "bold"), bg=button_col,
                               command=lambda: Thread(target=listen, daemon=True).start())
-    listen_button.place(relx=0.78, rely=0.35, relwidth=0.12, relheight=0.05)
+    listen_button.place(relx=0.68, rely=0.35, relwidth=0.10, relheight=0.05)
+
+    image_entry_button = tk.Button(root, text="Image detection", font=("arial", 10, "bold"), bg=button_col,
+                                   command=lambda: Thread(target=listen, daemon=True).start())
+    image_entry_button.place(relx=0.80, rely=0.35, relwidth=0.10, relheight=0.05)
 
 
 def get_rating(writing_score: int, acting_score: int, impact_score: int):
