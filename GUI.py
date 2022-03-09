@@ -6,6 +6,8 @@ import speech_recognition as sr
 import pyttsx3
 from AI_flow import get_ai_response
 from fuzzy import fuzzy_logic
+from cognitive_azure import connect
+from tkinter.filedialog import askopenfilename
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
@@ -123,7 +125,7 @@ def main_screen():
     listen_button.place(relx=0.68, rely=0.35, relwidth=0.10, relheight=0.05)
 
     image_entry_button = tk.Button(root, text="Image detection", font=("arial", 10, "bold"), bg=button_col,
-                                   command=lambda: Thread(target=listen, daemon=True).start())
+                                   command=lambda: describe_image())
     image_entry_button.place(relx=0.80, rely=0.35, relwidth=0.10, relheight=0.05)
 
 
@@ -170,6 +172,28 @@ def fuzzy_gui():
     global rating_label
     rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
     rating_label.place(relx=0.6, rely=0.65)
+
+
+def describe_image():
+    clear_root()
+    description_title = tk.Label(root, text="Image description", font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
+    description_title.place(relx=0.50, rely=0.05, anchor=tk.CENTER)
+    underline(description_title)
+
+    back_button = tk.Button(root, text="back", font=("arial", 10, "bold"), bg=button_col,
+                            command=lambda: clear_root() or main_screen())
+    back_button.place(relx=0.75, rely=0.025, relwidth=0.2, relheight=0.05)
+
+    global text_box
+    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8,
+                        relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+    text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
+
+    filename = askopenfilename()
+    caption_text: str = connect(filename)
+    Thread(target=speak, args=(caption_text,), daemon=True).start()
+    clear_text_box()
+    update_text_box(caption_text)
 
 
 if __name__ == "__main__":
