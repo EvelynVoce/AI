@@ -6,8 +6,9 @@ import speech_recognition as sr
 import pyttsx3
 from AI_flow import get_ai_response
 from fuzzy import fuzzy_logic
-from cognitive_azure import connect
+from cognitive_azure import get_description
 from tkinter.filedialog import askopenfilename
+from custom_vision import classify_image
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
@@ -29,14 +30,9 @@ question_entry = tk.Entry()
 text_box = tk.Text()
 rating_label = tk.Label()
 
-
-def globalise():
-    global question_entry
-    question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
-    global text_box
-    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
-    global rating_label
-    rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
+question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
 
 
 def clear_root():
@@ -101,7 +97,6 @@ def underline(label):  # A reusable function where a label is passed in, so it c
 
 
 def main_screen():
-    globalise()
     intro_message: str = "Welcome to this chat bot. Please feel free to ask questions from me!"
     root.bind('<Return>', check_entry)
     welcoming = tk.Label(root, text=intro_message,
@@ -190,10 +185,11 @@ def describe_image():
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
 
     filename = askopenfilename()
-    caption_text: str = connect(filename)
+    description: str = get_description(filename)
+    classification: str = classify_image(filename)
 
-    import custom_vision
-    caption_text += "\n" + custom_vision.custom_vision(filename)
+    caption_text: str = f"Classified as {classification}.\n" \
+                        f"Description: {description}"
 
     Thread(target=speak, args=(caption_text,), daemon=True).start()
     clear_text_box()
