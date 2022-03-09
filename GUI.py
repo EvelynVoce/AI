@@ -191,6 +191,10 @@ def describe_image():
 
     filename = askopenfilename()
     caption_text: str = connect(filename)
+
+    import custom_vision
+    caption_text += "\n" + custom_vision.custom_vision(filename)
+
     Thread(target=speak, args=(caption_text,), daemon=True).start()
     clear_text_box()
     update_text_box(caption_text)
