@@ -1,64 +1,79 @@
-# A classical NN; adapted from https://www.tensorflow.org/tutorials/keras/classification/
-
-import csv
-from tensorflow import keras, nn
+from tensorflow import keras
 from keras import layers
 from keras.preprocessing.image import ImageDataGenerator
-import matplotlib as plt
+from keras.preprocessing import image
+import numpy as np
+
+classifiers: list[str] = ["meeseeks", "morty", "rick", "summer"]
 
 
 def main():
-    csv_file = 'rick_morty.csv'
-    with open(csv_file, 'r') as f:
-        reader = csv.reader(f)
-        rows: dict[str, str] = {line[0]: line[1] for line in reader}  # Loading the dataset
-    class_names = list(rows.keys())
-    print(class_names)
-
     # All images will be rescaled by 1./255
-    train_datagen = ImageDataGenerator(rescale=1/255)
+    train_datagen = ImageDataGenerator()
     img_folder = 'RickMorty/train'
+
     # Flow training images in batches of 120 using train_datagen generator
     train_generator = train_datagen.flow_from_directory(
             img_folder,  # This is the source directory for training images
-            classes=class_names,
-            target_size=(200, 200),  # All images will be resized to 200x200
-            batch_size=120
+            classes=classifiers,
+            target_size=(250, 250),  # All images will be resized to 200x200
+            # batch_size=32  # <- Not to be confused with 1 image
     )
 
     model = keras.Sequential(
         [
-            keras.Input(shape=(200, 200, 3)),
-            layers.Conv2D(32, (3, 3), activation='relu'),
+            keras.Input(shape=(250, 250, 3)),
+            layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
             layers.MaxPooling2D(pool_size=(2, 2)),
-            layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
+            layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
             layers.MaxPooling2D(pool_size=(2, 2)),
             layers.Flatten(),
             layers.Dropout(0.5),
-            layers.Dense(256, activation="relu"),
-            layers.Dense(5, activation="sigmoid")
+            layers.Dense(64, activation="relu"),
+            layers.Dense(4, activation="sigmoid")
         ]
     )
 
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     model.fit(train_generator, epochs=10, batch_size=128)
 
-    # Evaluate the trained model
-    from keras.preprocessing import image
-    import numpy as np
-    img_path = r"RickMorty/train/meeseeks/00000000.jpg"
-    img = image.load_img(img_path, target_size=(200, 200))
+    model.save("model.h5")
+
+    evaluate_image(model, r"test/train/morty/00000000.png")
+    evaluate_image(model, r"test/train/meeseeks/00000000.jpg")
+    evaluate_image(model, r"test/train/rick/00000000.jpg")
+    evaluate_image(model, r"test/train/summer/00000000.jpg")
+
+
+# Evaluate the trained model
+def evaluate_image(model, img_path: str):
+    img = image.load_img(img_path, target_size=(250, 250))
     img.show()
 
     img_array = image.img_to_array(img)
     img_batch = np.expand_dims(img_array, axis=0)
 
     prediction = model.predict(img_batch)
-    print(prediction)
+    prediction_list: list[float] = list(prediction[0])
+    print(prediction_list)
+    index = prediction_list.index(max(prediction_list))
+
+    global classifiers
+    print(classifiers[index])
+    return classifiers[index]
 
 
 if __name__ == "__main__":
     main()
+
+
+    # csv_file = 'rick_morty.csv'
+    # with open(csv_file, 'r') as f:
+    #     reader = csv.reader(f)
+    #     rows: dict[str, str] = {line[0]: line[1] for line in reader}  # Loading the dataset
+    # class_names = list(rows.keys())
+    # print(class_names)
+
 
 
 # # A classical NN; adapted from https://www.tensorflow.org/tutorials/keras/classification/
