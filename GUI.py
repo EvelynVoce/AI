@@ -30,9 +30,15 @@ question_entry = tk.Entry()
 text_box = tk.Text()
 rating_label = tk.Label()
 
-question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
-text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
-rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
+
+def globalise():
+    # This function is needed for back buttons to work
+    global question_entry
+    question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
+    global text_box
+    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+    global rating_label
+    rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
 
 
 def clear_root():
@@ -97,6 +103,7 @@ def underline(label):  # A reusable function where a label is passed in, so it c
 
 
 def main_screen():
+    globalise()
     intro_message: str = "Welcome to this chat bot. Please feel free to ask questions from me!"
     root.bind('<Return>', check_entry)
     welcoming = tk.Label(root, text=intro_message,
@@ -181,7 +188,7 @@ def describe_image():
 
     global text_box
     text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8,
-                        relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+                       relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
 
     filename = askopenfilename()
