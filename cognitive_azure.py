@@ -1,6 +1,6 @@
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from msrest.authentication import CognitiveServicesCredentials
-import os
+from os import environ
 
 
 def get_caption(description) -> str:
@@ -9,8 +9,8 @@ def get_caption(description) -> str:
 
 
 def get_description(image_path: str) -> str:
-    cog_key: str = os.environ['cog_key']
-    cog_endpoint: str = os.environ['cog_endpoint']
+    cog_key: str = environ['cog_key']
+    cog_endpoint: str = environ['cog_endpoint']
 
     # Get a client for the computer vision service
     computer_vision_client = ComputerVisionClient(cog_endpoint, CognitiveServicesCredentials(cog_key))

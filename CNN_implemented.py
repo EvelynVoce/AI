@@ -20,7 +20,3 @@ def evaluate_image(model, img_path: str) -> str:
     prediction_list: list[float] = list(prediction[0])
     index: int = prediction_list.index(max(prediction_list))
     return classifiers[index]
-
-
-if __name__ == "__main__":
-    main()

@@ -1,13 +1,13 @@
 from azure.cognitiveservices.vision.customvision.prediction import CustomVisionPredictionClient
 from msrest.authentication import ApiKeyCredentials
-import os
+from os import environ
 
 
 def classify_image_azure(filename) -> str:
-    prediction_endpoint: str = os.environ['prediction_endpoint']
-    prediction_key: str = os.environ['prediction_key']
-    project_id: str = os.environ['project_id']
-    model_name: str = os.environ['model_name']
+    prediction_endpoint: str = environ['prediction_endpoint']
+    prediction_key: str = environ['prediction_key']
+    project_id: str = environ['project_id']
+    model_name: str = environ['model_name']
 
     prediction_credentials = ApiKeyCredentials(in_headers={"Prediction-key": prediction_key})
     prediction_client = CustomVisionPredictionClient(endpoint=prediction_endpoint, credentials=prediction_credentials)
