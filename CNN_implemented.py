@@ -2,20 +2,16 @@ from keras import models
 from keras.preprocessing import image
 import numpy as np
 
-classifiers: list[str] = ["meeseeks", "morty", "rick", "summer"]
+classifiers: list[str] = ["Meeseeks", "Morty", "Rick", "Summer"]
 
 
-def classify_image():
+def classify_image(path: str) -> str:
     model = models.load_model("model.h5")
-
-    evaluate_image(model, r"test/train/morty/00000000.png")
-    evaluate_image(model, r"test/train/meeseeks/00000000.jpg")
-    evaluate_image(model, r"test/train/rick/00000000.jpg")
-    evaluate_image(model, r"test/train/summer/00000000.jpg")
+    return evaluate_image(model, path)
 
 
 # Evaluate the trained model
-def evaluate_image(model, img_path: str):
+def evaluate_image(model, img_path: str) -> str:
     img = image.load_img(img_path, target_size=(250, 250))
     img_array = image.img_to_array(img)
     img_batch = np.expand_dims(img_array, axis=0)
