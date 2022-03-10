@@ -8,7 +8,8 @@ from AI_flow import get_ai_response
 from fuzzy import fuzzy_logic
 from cognitive_azure import get_description
 from tkinter.filedialog import askopenfilename
-from custom_vision import classify_image
+from custom_vision import classify_image_azure
+from CNN_implemented import classify_image
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
@@ -193,9 +194,11 @@ def describe_image():
 
     filename = askopenfilename()
     description: str = get_description(filename)
-    classification: str = classify_image(filename)
+    classification_azure: str = classify_image_azure(filename)
+    classification_local: str = classify_image(filename)
 
-    caption_text: str = f"Classified as {classification}.\n" \
+    caption_text: str = f"Azure classified as {classification_azure}.\n" \
+                        f"Locally classified as {classification_local}.\n"\
                         f"Description: {description}"
 
     Thread(target=speak, args=(caption_text,), daemon=True).start()
