@@ -178,35 +178,44 @@ def fuzzy_gui():
     rating_label.place(relx=0.6, rely=0.65)
 
 
-def describe_image():
-    clear_root()
-    description_title = tk.Label(root, text="Image description", font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
-    description_title.place(relx=0.50, rely=0.05, anchor=tk.CENTER)
-    underline(description_title)
-
-    back_button = tk.Button(root, text="back", font=("arial", 10, "bold"), bg=button_col,
-                            command=lambda: clear_root() or main_screen())
-    back_button.place(relx=0.75, rely=0.025, relwidth=0.2, relheight=0.05)
-
-    global text_box
-    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8,
-                       relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
-    text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
-
+def update_image_details():
     filename = askopenfilename()
-
     Thread(target=face_recognition, args=(filename,), daemon=True).start()
     classification_azure: str = classify_image_azure(filename)
     classification_local: str = classify_image(filename)
     description: str = get_description(filename)
 
     caption_text: str = f"Azure classified as {classification_azure}.\n" \
-                        f"Locally classified as {classification_local}.\n"\
+                        f"Locally classified as {classification_local}.\n" \
                         f"Description: {description}"
 
     Thread(target=speak, args=(caption_text,), daemon=True).start()
     clear_text_box()
     update_text_box(caption_text)
+
+
+def describe_image():
+    clear_root()
+    description_title = tk.Label(root, text="Image description", font=("arial", 28, "bold"), fg=fg_col, bg=bg_col)
+    description_title.place(relx=0.50, rely=0.05, anchor=tk.CENTER)
+    underline(description_title)
+
+    new_image_button = tk.Button(root, text="Select Image", font=("arial", 10, "bold"), bg=button_col,
+                                 command=update_image_details)
+    new_image_button.place(relx=0.69, rely=0.025, relwidth=0.1, relheight=0.05)
+
+
+    back_button = tk.Button(root, text="back", font=("arial", 10, "bold"), bg=button_col,
+                            command=lambda: clear_root() or main_screen())
+    back_button.place(relx=0.80, rely=0.025, relwidth=0.1, relheight=0.05)
+
+    global text_box
+    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8,
+                       relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+    text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
+    update_image_details()
+
+
 
 
 if __name__ == "__main__":

@@ -108,12 +108,4 @@ if __name__ == "__main__":
     main()
 
 
-    # csv_file = 'rick_morty.csv'
-    # with open(csv_file, 'r') as f:
-    #     reader = csv.reader(f)
-    #     rows: dict[str, str] = {line[0]: line[1] for line in reader}  # Loading the dataset
-    # class_names = list(rows.keys())
-    # print(class_names)
-
-
 
