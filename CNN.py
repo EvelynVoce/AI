@@ -45,6 +45,7 @@ def hyperparameter_tuning(train_generator):
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         model.fit(train_generator, epochs=epochs, batch_size=batch_size)
 
+
 def main():
     # All images will be rescaled by 1./255
     train_datagen = ImageDataGenerator()

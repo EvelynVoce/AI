@@ -10,6 +10,7 @@ from cognitive_azure import get_description
 from tkinter.filedialog import askopenfilename
 from custom_vision import classify_image_azure
 from CNN_implemented import classify_image
+from face_service import face_recognition
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
@@ -193,9 +194,11 @@ def describe_image():
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
 
     filename = askopenfilename()
-    description: str = get_description(filename)
+
+    Thread(target=face_recognition, args=(filename,), daemon=True).start()
     classification_azure: str = classify_image_azure(filename)
     classification_local: str = classify_image(filename)
+    description: str = get_description(filename)
 
     caption_text: str = f"Azure classified as {classification_azure}.\n" \
                         f"Locally classified as {classification_local}.\n"\
