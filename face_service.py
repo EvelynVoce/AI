@@ -25,7 +25,7 @@ def draw_face_rectangles(image_path: str, detected_faces):
     image = Image.open(image_path)
     draw = ImageDraw.Draw(image)
     for face in detected_faces:
-        draw.rectangle(get_rectangle(face), outline='red')
+        draw.rectangle(get_rectangle(face), outline='red', width=4)
     image.show()
 
 

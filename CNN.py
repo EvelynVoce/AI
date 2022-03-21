@@ -77,7 +77,7 @@ def main():
             layers.MaxPooling2D(pool_size=(2, 2)),
             layers.Flatten(),
             # layers.Dense(64, activation="relu", kernel_constraint=maxnorm(3)),  # 64 neurons
-            layers.Dense(128, activation="relu", kernel_constraint=maxnorm(3)),  # 64 neurons
+            layers.Dense(128, activation="relu", kernel_constraint=maxnorm(3)),  # 128 neurons
             layers.Dropout(0.2),
             layers.Dense(4, activation="sigmoid")  # 4 neurons
         ]
@@ -87,7 +87,7 @@ def main():
     model.fit(train_generator, epochs=5, batch_size=32)
     model.save("model.h5")
 
-    evaluate_image(model, r"DoctorWho/test/EleventhDoctor/images435.jpg")
+    evaluate_image(model, r"DoctorWho/test/EleventhDoctor/large2.jpg")
     evaluate_image(model, r"DoctorWho/test/TenthDoctor/images407.jpg")
     evaluate_image(model, r"DoctorWho/test/ThirteenthDoctor/91F3Nr-i2L.jpg")
     evaluate_image(model, r"DoctorWho/test/TwelfthDoctor/The-Doctor-Who-Companion-The-Twelfth-Doctor-Vol-1-cover.jpg")

@@ -1,9 +1,10 @@
 from wikipedia import summary, exceptions
 from similarity import get_similar
-import nltk
+
 from pyjokes import get_joke
 from pandas import read_csv
 
+import nltk
 from nltk.sem import Expression
 from nltk.inference import ResolutionProver
 

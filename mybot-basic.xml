@@ -83,17 +83,17 @@
   <template><srai>RATE EPISODE</srai></template></category>
 
 
-  
-  
+
+
 <!-- Joke -->
 <category> <pattern> TELL ME A JOKE</pattern>
     <template>#5$</template> </category>
 
 <category> <pattern> CAN YOU TELL ME A JOKE </pattern>
     <template><srai> TELL ME A JOKE </srai></template> </category>
-  
-  
-  
+
+
+    
 <!-- Manners -->
 <category> <pattern> HOW ARE YOU </pattern>
   <template>I'm functioning within normal parameters, thanks for asking.</template></category>
