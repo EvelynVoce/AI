@@ -11,7 +11,7 @@ classifiers: list[str] = ["EleventhDoctor", "TenthDoctor", "ThirteenthDoctor", "
 
 
 def hyperparameter_tuning(train_generator):
-    params_nn = {
+    params_nn: dict = {
         'neurons': [32, 64, 128],
         'activation': ['relu', 'sigmoid'],
         'batch_size': [32, 64],
@@ -76,7 +76,8 @@ def main():
             layers.Conv2D(16, kernel_size=(3, 3), activation='relu'),
             layers.MaxPooling2D(pool_size=(2, 2)),
             layers.Flatten(),
-            layers.Dense(64, activation="relu", kernel_constraint=maxnorm(3)),  # 64 neurons
+            # layers.Dense(64, activation="relu", kernel_constraint=maxnorm(3)),  # 64 neurons
+            layers.Dense(128, activation="relu", kernel_constraint=maxnorm(3)),  # 64 neurons
             layers.Dropout(0.2),
             layers.Dense(4, activation="sigmoid")  # 4 neurons
         ]
@@ -86,10 +87,10 @@ def main():
     model.fit(train_generator, epochs=5, batch_size=32)
     model.save("model.h5")
 
-    # evaluate_image(model, r"RickMorty/train/morty/00000000.png")
-    # evaluate_image(model, r"RickMorty/train/meeseeks/00000000.jpg")
-    # evaluate_image(model, r"RickMorty/train/rick/00000001.jpg")
-    # evaluate_image(model, r"RickMorty/train/summer/00000000.jpg")
+    evaluate_image(model, r"DoctorWho/test/EleventhDoctor/images435.jpg")
+    evaluate_image(model, r"DoctorWho/test/TenthDoctor/images407.jpg")
+    evaluate_image(model, r"DoctorWho/test/ThirteenthDoctor/91F3Nr-i2L.jpg")
+    evaluate_image(model, r"DoctorWho/test/TwelfthDoctor/The-Doctor-Who-Companion-The-Twelfth-Doctor-Vol-1-cover.jpg")
 
 
 # Evaluate the trained model

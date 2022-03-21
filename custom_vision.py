@@ -3,7 +3,7 @@ from msrest.authentication import ApiKeyCredentials
 from os import environ
 
 
-def classify_image_azure(filename) -> str:
+def classify_image_azure(filename, ai_image_results):
     prediction_endpoint: str = environ['prediction_endpoint']
     prediction_key: str = environ['prediction_key']
     project_id: str = environ['project_id']
@@ -14,4 +14,4 @@ def classify_image_azure(filename) -> str:
 
     with open(filename, mode="rb") as image_data:
         results = prediction_client.classify_image(project_id, model_name, image_data)
-    return results.predictions[0].tag_name
+    ai_image_results.azure_class = results.predictions[0].tag_name

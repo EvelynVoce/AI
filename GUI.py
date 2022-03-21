@@ -14,7 +14,7 @@ from face_service import face_recognition
 
 voice = pyttsx3.init()
 rate = voice.getProperty('rate')
-voice.setProperty('rate', rate+50)
+voice.setProperty('rate', rate + 50)
 
 kern = aiml.Kernel()
 kern.bootstrap(learnFiles="mybot-basic.xml")
@@ -38,7 +38,8 @@ def globalise():
     global question_entry
     question_entry = tk.Entry(root, relief=tk.GROOVE, bd=2, font=("arial", 13))
     global text_box
-    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
+    text_box = tk.Text(root, wrap=tk.WORD, cursor="arrow", bd=8, relief=tk.GROOVE, font=("arial", 20),
+                       state=tk.DISABLED)
     global rating_label
     rating_label = tk.Label(root, text="Overall rating: 0", font=("arial", 25, "bold"), fg=fg_col, bg=bg_col)
 
@@ -170,7 +171,7 @@ def fuzzy_gui():
     fuzzy_submission = tk.Button(root, text="Get overall rating", font=("arial", 10, "bold"),
                                  bg=button_col, command=lambda:
                                  get_rating(int(writing_entry.get()), int(acting_entry.get()),
-                                            int(impact_entry.get())))
+                                 int(impact_entry.get())))
     fuzzy_submission.place(relx=0.20, rely=0.65, relwidth=0.28, relheight=0.1)
 
     global rating_label
@@ -178,16 +179,35 @@ def fuzzy_gui():
     rating_label.place(relx=0.6, rely=0.65)
 
 
-def update_image_details():
-    filename = askopenfilename()
-    Thread(target=face_recognition, args=(filename,), daemon=True).start()
-    classification_azure: str = classify_image_azure(filename)
-    classification_local: str = classify_image(filename)
-    description: str = get_description(filename)
+class ImageData:
 
-    caption_text: str = f"Azure classified as {classification_azure}.\n" \
-                        f"Locally classified as {classification_local}.\n" \
-                        f"Description: {description}"
+    def __init__(self):
+        self.local_class: str = ""
+        self.azure_class: str = ""
+        self.description: str = ""
+
+
+def update_image_details():
+    filename: str = askopenfilename()
+    Thread(target=face_recognition, args=(filename,), daemon=True).start()
+
+    ai_image_results = ImageData()
+    t1 = Thread(target=classify_image_azure, args=(filename, ai_image_results), daemon=True)
+    t1.start()
+
+    t2 = Thread(target=classify_image, args=(filename, ai_image_results), daemon=True)
+    t2.start()
+
+    t3 = Thread(target=get_description, args=(filename, ai_image_results), daemon=True)
+    t3.start()
+
+    t1.join()
+    t2.join()
+    t3.join()
+
+    caption_text: str = f"Azure classified as {ai_image_results.azure_class}.\n" \
+                        f"Locally classified as {ai_image_results.local_class}.\n" \
+                        f"Description: {ai_image_results.description}"
 
     Thread(target=speak, args=(caption_text,), daemon=True).start()
     clear_text_box()
@@ -204,7 +224,6 @@ def describe_image():
                                  command=update_image_details)
     new_image_button.place(relx=0.69, rely=0.025, relwidth=0.1, relheight=0.05)
 
-
     back_button = tk.Button(root, text="back", font=("arial", 10, "bold"), bg=button_col,
                             command=lambda: clear_root() or main_screen())
     back_button.place(relx=0.80, rely=0.025, relwidth=0.1, relheight=0.05)
@@ -214,8 +233,6 @@ def describe_image():
                        relief=tk.GROOVE, font=("arial", 20), state=tk.DISABLED)
     text_box.place(relx=0.1, rely=0.5, relwidth=0.80, relheight=0.4)
     update_image_details()
-
-
 
 
 if __name__ == "__main__":

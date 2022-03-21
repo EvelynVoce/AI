@@ -20,7 +20,7 @@ def get_rectangle(faceDictionary):
     return (left, top), (right, bottom)
 
 
-def draw_face_rectangles(image_path, detected_faces):
+def draw_face_rectangles(image_path: str, detected_faces):
     # For each face returned use the face rectangle and draw a red box.
     image = Image.open(image_path)
     draw = ImageDraw.Draw(image)
@@ -32,4 +32,3 @@ def draw_face_rectangles(image_path, detected_faces):
 def face_recognition(path: str):
     detected_faces = get_faces(path)
     draw_face_rectangles(path, detected_faces)
-
