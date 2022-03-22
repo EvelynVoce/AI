@@ -10,7 +10,7 @@ from keras.constraints import maxnorm
 classifiers: list[str] = ["EleventhDoctor", "TenthDoctor", "ThirteenthDoctor", "TwelfthDoctor"]
 
 
-def hyperparameter_tuning(train_generator):
+def hyperparameter_tuning(train_generator, validation_generator):
     params_nn: dict = {
         'neurons': [32, 64, 128],
         'activation': ['relu', 'sigmoid'],
@@ -32,7 +32,7 @@ def hyperparameter_tuning(train_generator):
 
         model = keras.Sequential(
             [
-                keras.Input(shape=(500, 500, 3)),
+                keras.Input(shape=(250, 250, 3)),
                 layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
                 layers.MaxPooling2D(pool_size=(2, 2)),
                 layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
@@ -47,28 +47,35 @@ def hyperparameter_tuning(train_generator):
         )
 
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        model.fit(train_generator, epochs=epochs, batch_size=batch_size)
+        model.fit(train_generator, epochs=epochs, batch_size=batch_size, validation_data=validation_generator)
 
 
 def main():
     # All images will be rescaled by 1./255
     train_datagen = ImageDataGenerator()
-    img_folder = 'DoctorWho/Train'
 
     # Flow training images in batches of 120 using train_datagen generator
     train_generator = train_datagen.flow_from_directory(
-            img_folder,  # This is the source directory for training images
+            'DoctorWho/Train',  # This is the source directory for training images
             classes=classifiers,
-            target_size=(500, 500),  # All images will be resized to 200x200
+            target_size=(250, 250),  # All images will be resized to 200x200
             # batch_size=32  # <- Not to be confused with 1 image
     )
 
+    # Flow training images in batches of 120 using train_datagen generator
+    validation_generator = train_datagen.flow_from_directory(
+        'DoctorWho/Validation',  # This is the source directory for training images
+        classes=classifiers,
+        target_size=(250, 250),  # All images will be resized to 200x200
+        # batch_size=32  # <- Not to be confused with 1 image
+    )
+
     # Hyperparameter tuning (commented out to make training run quicker now I already know the results)
-    # hyperparameter_tuning(train_generator)
+    # hyperparameter_tuning(train_generator, validation_generator)
 
     model = keras.Sequential(
         [
-            keras.Input(shape=(500, 500, 3)),
+            keras.Input(shape=(250, 250, 3)),
             layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
             layers.MaxPooling2D(pool_size=(2, 2)),
             layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
@@ -84,18 +91,18 @@ def main():
     )
 
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(train_generator, epochs=5, batch_size=32)
+    model.fit(train_generator, epochs=10, batch_size=64, validation_data=validation_generator)
     model.save("model.h5")
 
-    evaluate_image(model, r"DoctorWho/test/EleventhDoctor/large2.jpg")
-    evaluate_image(model, r"DoctorWho/test/TenthDoctor/images407.jpg")
-    evaluate_image(model, r"DoctorWho/test/ThirteenthDoctor/91F3Nr-i2L.jpg")
-    evaluate_image(model, r"DoctorWho/test/TwelfthDoctor/The-Doctor-Who-Companion-The-Twelfth-Doctor-Vol-1-cover.jpg")
+    evaluate_image(model, r"DoctorWho/Validation/TenthDoctor/intro-1600199567.jpg")
+    evaluate_image(model, r"DoctorWho/Validation/EleventhDoctor/large2.jpg")
+    evaluate_image(model, r"DoctorWho/Validation/TwelfthDoctor/Twelfth_Doctor_28Doctor_Who29.jpg")
+    evaluate_image(model, r"DoctorWho/Validation/ThirteenthDoctor/91F3Nr-i2L.jpg")
 
 
 # Evaluate the trained model
 def evaluate_image(model, img_path: str):
-    img = image.load_img(img_path, target_size=(500, 500))
+    img = image.load_img(img_path, target_size=(250, 250))
     img.show()
 
     img_array = image.img_to_array(img)

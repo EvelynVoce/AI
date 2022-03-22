@@ -93,7 +93,7 @@
     <template><srai> TELL ME A JOKE </srai></template> </category>
 
 
-    
+
 <!-- Manners -->
 <category> <pattern> HOW ARE YOU </pattern>
   <template>I'm functioning within normal parameters, thanks for asking.</template></category>

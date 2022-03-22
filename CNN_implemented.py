@@ -13,7 +13,7 @@ def classify_image(path: str, ai_image_results):
 
 # Evaluate the trained model
 def evaluate_image(model, img_path: str) -> str:
-    img = image.load_img(img_path, target_size=(500, 500))
+    img = image.load_img(img_path, target_size=(250, 250))
     img_array = image.img_to_array(img)
     img_batch = np.expand_dims(img_array, axis=0)
 
