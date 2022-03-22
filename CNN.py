@@ -72,7 +72,6 @@ def main():
 
     # Hyperparameter tuning (commented out to make training run quicker now I already know the results)
     # hyperparameter_tuning(train_generator, validation_generator)
-
     model = keras.Sequential(
         [
             keras.Input(shape=(250, 250, 3)),
@@ -101,7 +100,7 @@ def main():
 
 
 # Evaluate the trained model
-def evaluate_image(model, img_path: str):
+def evaluate_image(model, img_path: str) -> str:
     img = image.load_img(img_path, target_size=(250, 250))
     img.show()
 
@@ -115,6 +114,27 @@ def evaluate_image(model, img_path: str):
 
     print(classifiers[index])
     return classifiers[index]
+
+
+# Slightly more accurate but takes around 25 minutes just to run train 10 epochs
+def vgg16_model():
+    return keras.Sequential(
+        [
+            keras.Input(shape=(250, 250, 3)),
+            layers.Conv2D(128, kernel_size=(3, 3), activation='relu'),
+            layers.Conv2D(128, kernel_size=(3, 3), activation='relu'),
+            layers.MaxPooling2D(pool_size=(2, 2)),
+            layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
+            layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
+            layers.MaxPooling2D(pool_size=(2, 2)),
+            layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
+            layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
+            layers.MaxPooling2D(pool_size=(2, 2)),
+            layers.Flatten(),
+            layers.Dense(128, activation="relu", kernel_constraint=maxnorm(3)),
+            layers.Dropout(0.2),
+            layers.Dense(4, activation="sigmoid")
+        ])
 
 
 if __name__ == "__main__":
